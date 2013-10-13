@@ -8,12 +8,12 @@ import org.joda.time.DateTime
  * Time: 1:30 PM
  */
 case class CombatEvent(timestamp: DateTime,
-                       owner: CombatThing,
-                       source: CombatThing,
-                       target: CombatThing,
-                       event: CombatThing,
+                       owner: CombatCharacter,
+                       source: CombatCharacter,
+                       target: CombatCharacter,
+                       event: CombatAction,
                        eventType: String,
-                       flags: String,
+                       flags: Set[String],
                        value: Double,
                        baseValue: Double) {
   override def toString: String = {
@@ -25,7 +25,7 @@ case class CombatEvent(timestamp: DateTime,
     append("target", target.name)
     append("event", event.name)
     append("type", eventType)
-    append("flags", flags)
+    append("flags", "{ " + flags.toList.sorted.mkString(", ") + " }")
     append("value", value)
     append("baseValue", baseValue)
     sb.append(" }")

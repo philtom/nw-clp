@@ -20,7 +20,7 @@ object ExamineLog extends App {
   val logs = CombatLogReader.read("data/Combatlog.Log")
   logs foreach {
     log =>
-      log.flags.split('|') foreach (f => if (f.nonEmpty) flags.put(f, flags.getOrElse(f, 0) + 1))
+      log.flags foreach (f => if (f.nonEmpty) flags.put(f, flags.getOrElse(f, 0) + 1))
       types.put(log.eventType, types.getOrElse(log.eventType, 0) + 1)
       events.put(log.event.name, events.getOrElse(log.event.name, 0) + 1)
       targets.put(log.target.name, targets.getOrElse(log.target.name, 0) + 1)
