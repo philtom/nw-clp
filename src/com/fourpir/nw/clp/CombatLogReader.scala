@@ -29,12 +29,12 @@ object CombatLogReader {
 
   private[clp] def parseEvent(timestamp: DateTime, line: String): CombatEvent = {
     val Array(ownerName, ownerId, sourceName, sourceId, targetName, targetId, eventName, eventId, eventType, flags, value, baseValue) = line.split(",")
-    val owner = CombatCharacter(ownerName, ownerId)
-    def resolveCharacter(name: String, id: String): CombatCharacter = {
+    val owner = new Entity(ownerName, ownerId)
+    def resolveCharacter(name: String, id: String): Entity = {
       if (id == "*")
         owner
       else
-        CombatCharacter(name, id)
+        new Entity(name, id)
     }
 
     CombatEvent(

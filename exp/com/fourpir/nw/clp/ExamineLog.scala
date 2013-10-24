@@ -17,7 +17,7 @@ object ExamineLog extends App {
   val types = mutable.HashMap[String, Int]()
   val flags = mutable.HashMap[String, Int]()
 
-  val logs = CombatLogReader.read("data/Combatlog.Log")
+  val logs = CombatLogReader.read("data/combatlog-20131014.log")
   logs foreach {
     log =>
       log.flags foreach (f => if (f.nonEmpty) flags.put(f, flags.getOrElse(f, 0) + 1))
@@ -26,14 +26,23 @@ object ExamineLog extends App {
       targets.put(log.target.name, targets.getOrElse(log.target.name, 0) + 1)
       owners.put(log.owner.name, owners.getOrElse(log.owner.name, 0) + 1)
       sources.put(log.source.name, sources.getOrElse(log.source.name, 0) + 1)
-
-      if (log.target.name == "heeme") println(log)
   }
 
-  println(owners)
-  println(sources)
-  println(targets)
-  println(events)
-  println(types)
-  println(flags)
+  println("owners")
+  owners foreach println
+
+  println("sources")
+  sources foreach println
+
+  println("targets")
+  targets foreach println
+
+  println("events")
+  events foreach println
+
+  println("types")
+  types foreach println
+
+  println("flags")
+  flags foreach println
 }

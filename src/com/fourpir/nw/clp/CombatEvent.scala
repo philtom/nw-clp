@@ -8,9 +8,9 @@ import org.joda.time.DateTime
  * Time: 1:30 PM
  */
 case class CombatEvent(timestamp: DateTime,
-                       owner: CombatCharacter,
-                       source: CombatCharacter,
-                       target: CombatCharacter,
+                       owner: Entity,
+                       source: Entity,
+                       target: Entity,
                        event: CombatAction,
                        eventType: String,
                        flags: Set[String],
