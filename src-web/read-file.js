@@ -14,7 +14,7 @@ function handleFileSelect(evt) {
       var lines = text.split(/[\r\n]+/g);
       lines.forEach(function(line) {
         if (line != "") {
-          var log = parseCombatLogEntry(line);
+          var log = nw.clp.parseCombatLogEntry(line);
           logs.push(JSON.stringify(log));
         }
       });
