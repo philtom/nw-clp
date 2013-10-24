@@ -20,11 +20,11 @@ function handleFileSelect(evt) {
       });
       clp.logs = logs;
 
+      $("#players").empty();
       var playerSourceEvents = _.groupBy(clp.logs.filter(function(log) { return log.source.id.indexOf('P') == 0 }), function(log) { return log.source.id });
-      var rows = _.map(Object.keys(playerSourceEvents), function(id) {
-        return createRow(id, playerSourceEvents[id]);
+      Object.keys(playerSourceEvents).forEach(function(id) {
+        $("#players").append(createRow(id, playerSourceEvents[id]))
       });
-      document.getElementById('players').innerHTML = rows.join("\n")
     }
   };
 
@@ -34,8 +34,20 @@ function handleFileSelect(evt) {
 function createRow(id, events) {
   var name = idToName(id),
       damage = calcDamage(events),
-      heal = calcHeal(events);
-  return "<div class=\"row\"><div class=\"cell\">" + name + "</div><div class=\"cell\">" + parseInt(damage) + "</div><div class=\"cell\">" + parseInt(heal) + "</div></div>";
+      heal = calcHeal(events),
+      row = document.createElement("div");
+  $(row).addClass("row");
+  $(row).append(createCell(name));
+  $(row).append(createCell(parseInt(damage)));
+  $(row).append(createCell(parseInt(heal)));
+  return row;
+}
+
+function createCell(text) {
+  var cell = document.createElement("div");
+  $(cell).addClass("cell");
+  $(cell).text(text);
+  return cell;
 }
 
 function idToName(id) {
