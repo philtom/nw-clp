@@ -33,8 +33,9 @@ function handleFileSelect(evt) {
 
 function createRow(id, events) {
   var name = idToName(id),
-      damage = calcDamage(events);
-  return "<div>" + name + " " + damage + "</div>";
+      damage = calcDamage(events),
+      heal = calcHeal(events);
+  return "<div>" + name + " " + parseInt(damage) + " " + parseInt(heal) + "</div>";
 }
 
 function idToName(id) {
@@ -54,6 +55,22 @@ function totalDamage(total, event) {
 function damage(event) {
   if (event.event.value > 0) {
     return event.event.value;
+  } else {
+    return 0;
+  }
+}
+
+function calcHeal(events) {
+  return _.reduce(events, totalHeal, 0);
+}
+
+function totalHeal(total, event) {
+  return parseFloat(total) + parseFloat(heal(event));
+}
+
+function heal(event) {
+  if (event.event.value < 0) {
+    return -event.event.value;
   } else {
     return 0;
   }
