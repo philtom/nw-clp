@@ -1,6 +1,6 @@
-window.onload = function() {
-    document.getElementById('files').addEventListener('change', handleFileSelect, false);
-};
+$(document).ready(function() {
+  $("#files").change(handleFileSelect);
+});
 
 function handleFileSelect(evt) {
   var files = evt.target.files; // FileList object
