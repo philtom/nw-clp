@@ -1,3 +1,5 @@
+var clp = new Object();
+
 function parseCombatLogEntry(log) {
   var timeEntry = log.split(/::/),
       timestamp = parseTimestamp(timeEntry[0]);
@@ -5,7 +7,7 @@ function parseCombatLogEntry(log) {
       owner = createActor(tokens[0], tokens[1]),
       source = createActor(tokens[2], tokens[3]),
       target = createActor(tokens[4], tokens[5]),
-      event = createEvent(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10]),
+      event = createEvent(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10], tokens[11]),
       log = createLog(timestamp, owner, source, target, event);
   return log;
 }
@@ -14,14 +16,16 @@ function createActor(name, id) {
   var actor = new Object();
   actor.name = name;
   actor.id = id;
+
   return actor;
 }
 
-function createEvent(name, id, type, value, baseValue) {
+function createEvent(name, id, type, flags, value, baseValue) {
   var event = new Object();
   event.name = name;
   event.id = id;
   event.type = type;
+  event.flags = flags.split('|').filter(function(flag) { return !(flag === "") });
   event.value = value;
   event.baseValue = baseValue;
   return event;
