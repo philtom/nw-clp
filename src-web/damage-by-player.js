@@ -35,7 +35,7 @@ function createRow(id, events) {
   var name = idToName(id),
       damage = calcDamage(events),
       heal = calcHeal(events);
-  return "<div>" + name + " " + parseInt(damage) + " " + parseInt(heal) + "</div>";
+  return "<div class=\"row\"><div class=\"cell\">" + name + "</div><div class=\"cell\">" + parseInt(damage) + "</div><div class=\"cell\">" + parseInt(heal) + "</div></div>";
 }
 
 function idToName(id) {
