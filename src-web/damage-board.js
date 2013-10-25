@@ -6,7 +6,7 @@ nwclp.DamageBoard = function(el, file) {
   this.lastRead = 0,
   this.leftOver = "",
   this.clp = new nwclp.CombatLogParser(),
-  this.actionTree = new nwclp.ActionTree(),
+  this.actionMap = new nwclp.ActionMap(),
   this.incrementalRead = function() {
     // reading at most 1 MB into memory at a time.  might need to optimise this buffer size.
     var endByte = Math.min(self.lastRead + 1048576, file.size),
@@ -59,11 +59,11 @@ nwclp.DamageBoard = function(el, file) {
       var damageDoneCell = $(row).children(".damage-done")[0];
       var healsDoneCell = $(row).children(".heals-done")[0];
 
-      entries.forEach(self.actionTree.addEvent);
+      entries.forEach(self.actionMap.addEvent);
 
-      $(damageDoneCell).text(parseInt(self.actionTree.damageForOwner(id)));
+      $(damageDoneCell).text(parseInt(self.actionMap.damageForOwner(id)));
 
-      $(healsDoneCell).text(parseInt(self.actionTree.healsForOwner(id)));
+      $(healsDoneCell).text(parseInt(self.actionMap.healsForOwner(id)));
     }
   },
 
@@ -124,7 +124,7 @@ nwclp.DamageBoard = function(el, file) {
   };
 }
 
-nwclp.ActionTree = function() {
+nwclp.ActionMap = function() {
   var self = this;
   // owner
   //  source
@@ -177,5 +177,4 @@ nwclp.ActionTree = function() {
       }, total);
     }, 0);
   };
-
 }
