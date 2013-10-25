@@ -53,7 +53,9 @@ nwclp.DamageBoard = function(el, file) {
     if (entry.owner.id.indexOf('P') == 0) {
       var row = self.getOrCreateRow(entry.owner);
       var damageDone = $(row).children(".damage-done")[0];
-      $(damageDone).text(parseFloat($(damageDone).text()) + parseFloat(damage(entry)));
+      $(damageDone).text(parseFloat($(damageDone).text()) + parseFloat(self.damage(entry)));
+      var healsDone = $(row).children(".heals-done")[0];
+      $(healsDone).text(parseFloat($(healsDone).text()) + parseFloat(self.heals(entry)));
     }
   },
 
@@ -92,6 +94,14 @@ nwclp.DamageBoard = function(el, file) {
   this.damage = function(entry) {
     if (entry.event.value > 0) {
       return entry.event.value;
+    } else {
+      return 0;
+    }
+  },
+
+  this.heals = function(entry) {
+    if (entry.event.value < 0) {
+      return -entry.event.value;
     } else {
       return 0;
     }
