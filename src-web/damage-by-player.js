@@ -8,3 +8,7 @@ function handleFileSelect(evt) {
   nwclp.board = new nwclp.DamageBoard($("#players"), evt.target.files[0]);
   nwclp.board.incrementalRead(nwclp.board);
 }
+
+function hide(id) {
+  nwclp.board.hideRow(id);
+}

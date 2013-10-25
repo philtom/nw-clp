@@ -13,8 +13,25 @@
 
 .cell {
   display:table-cell;
-  width:33%;
+  width:25%;
   text-align:right;
   padding-right:5px;
   padding-left:5px;
+}
+
+.hide {
+  text-align:left;
+  font-size:x-small;
+}
+
+.hide a {
+  color:#929292;
+}
+
+a:link, a.visited {
+  text-decoration:none;
+}
+
+a:hover, a:active {
+  text-decoration:underline;
 }

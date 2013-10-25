@@ -68,11 +68,20 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.getOrCreateRow = function(actor) {
-    var divId = "#" + self.idToHtmlId(actor.id);
-    if ($(self.el).children(divId).length == 0) {
-      return self.createRow(actor.id, actor.name, 0, 0);
+    var row = self.getRow(actor.id);
+    if (row == null) {
+      row = self.createRow(actor.id, actor.name, 0, 0);
+    }
+    return row;
+  },
+
+  this.getRow = function(id) {
+    var divId = "#" + self.idToHtmlId(id);
+    var rows = $(self.el).children(divId);
+    if (rows.length == 0) {
+      return null;
     } else {
-      return $(self.el).children(divId)[0];
+      return rows[0];
     }
   },
 
@@ -88,6 +97,7 @@ nwclp.DamageBoard = function(el, file) {
     $(row).append(self.createCell(name, name, "name"));
     $(row).append(self.createCell(parseInt(damageDone), "damage-done"));
     $(row).append(self.createCell(parseInt(healsDone), "heals-done"));
+    $(row).append(self.createCell("<a href=\"javascript:void(0);\" onclick=\"hide('" + id +"')\">hide</a>", "hide"));
     $(self.el).append(row)
 
     $(self.el).children().sort(function(a,b) {
@@ -103,7 +113,7 @@ nwclp.DamageBoard = function(el, file) {
     var cell = document.createElement("div");
     $(cell).addClass("cell");
     $(cell).addClass(type);
-    $(cell).text(text);
+    $(cell).html(text);
     return cell;
   },
 
@@ -120,6 +130,13 @@ nwclp.DamageBoard = function(el, file) {
       return -entry.event.value;
     } else {
       return 0;
+    }
+  },
+
+  this.hideRow = function(id) {
+    var row = self.getRow(id);
+    if (row != null) {
+      $(row).css('display', 'none');
     }
   };
 }
