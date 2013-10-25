@@ -1,9 +1,11 @@
 var nwclp = new Object();
 
 nwclp.clp = new function() {
+  var self = this;
+
   this.parseCombatLogEntry = function (log) {
     var timeEntry = log.split(/::/),
-        timestamp = this.parseTimestamp(timeEntry[0]);
+        timestamp = self.parseTimestamp(timeEntry[0]);
         tokens = timeEntry[1].split(/,/);
         owner = new nwclp.Actor(tokens[0], tokens[1]),
         source = new nwclp.Actor(tokens[2], tokens[3]),

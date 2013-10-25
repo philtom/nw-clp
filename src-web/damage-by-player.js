@@ -1,6 +1,11 @@
 $(document).ready(function() {
-  $("#files").change(handleFileSelect);
+  $("#files").change(asdf);
 });
+
+function asdf(evt) {
+  nwclp.board = new nwclp.DamageBoard($("#players"), evt.target.files[0]);
+  nwclp.board.incrementalRead(nwclp.board);
+}
 
 function handleFileSelect(evt) {
   var files = evt.target.files; // FileList object
