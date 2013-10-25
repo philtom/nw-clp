@@ -14,14 +14,14 @@ function handleFileSelect(evt) {
       var lines = text.split(/[\r\n]+/g);
       lines.forEach(function(line) {
         if (line != "") {
-          var log = nw.clp.parseCombatLogEntry(line);
+          var log = nwclp.clp.parseCombatLogEntry(line);
           logs.push(log);
         }
       });
-      nw.logs = logs;
+      nwclp.logs = logs;
 
       $("#players").empty();
-      var playerSourceEvents = _.groupBy(nw.logs.filter(function(log) { return log.source.id.indexOf('P') == 0 }), function(log) { return log.source.id });
+      var playerSourceEvents = _.groupBy(nwclp.logs.filter(function(log) { return log.source.id.indexOf('P') == 0 }), function(log) { return log.source.id });
       Object.keys(playerSourceEvents).forEach(function(id) {
         $("#players").append(createRow(id, playerSourceEvents[id]))
       });
@@ -51,7 +51,7 @@ function createCell(text) {
 }
 
 function idToName(id) {
-  return _.find(nw.logs, function(log) {
+  return _.find(nwclp.logs, function(log) {
     return log.source.id == id
   }).source.name;
 }

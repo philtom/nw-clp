@@ -1,15 +1,15 @@
-var nw = new Object();
+var nwclp = new Object();
 
-nw.clp = new function() {
+nwclp.clp = new function() {
   this.parseCombatLogEntry = function (log) {
     var timeEntry = log.split(/::/),
         timestamp = this.parseTimestamp(timeEntry[0]);
         tokens = timeEntry[1].split(/,/);
-        owner = new nw.Actor(tokens[0], tokens[1]),
-        source = new nw.Actor(tokens[2], tokens[3]),
-        target = new nw.Actor(tokens[4], tokens[5]),
-        event = new nw.Event(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10], tokens[11]),
-        log = new nw.Entry(timestamp, owner, source, target, event);
+        owner = new nwclp.Actor(tokens[0], tokens[1]),
+        source = new nwclp.Actor(tokens[2], tokens[3]),
+        target = new nwclp.Actor(tokens[4], tokens[5]),
+        event = new nwclp.Event(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10], tokens[11]),
+        log = new nwclp.Entry(timestamp, owner, source, target, event);
     return log;
   },
 
@@ -27,7 +27,7 @@ nw.clp = new function() {
   };
 }
 
-nw.Entry = function (timestamp, owner, source, target, event) {
+nwclp.Entry = function (timestamp, owner, source, target, event) {
   this.timestamp = timestamp;
   this.owner = owner;
   this.source = source;
@@ -43,7 +43,7 @@ nw.Entry = function (timestamp, owner, source, target, event) {
   }
 }
 
-nw.Event = function (name, id, type, flags, value, baseValue) {
+nwclp.Event = function (name, id, type, flags, value, baseValue) {
   this.name = name;
   this.id = id;
   this.type = type;
@@ -56,7 +56,7 @@ nw.Event = function (name, id, type, flags, value, baseValue) {
   }
 }
 
-nw.Actor = function (name, id) {
+nwclp.Actor = function (name, id) {
   this.name = name;
   this.id = id;
 }
