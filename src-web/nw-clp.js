@@ -10,6 +10,7 @@ nwclp.CombatLogParser = function() {
         owner = new nwclp.Actor(tokens[0], tokens[1]),
         source = new nwclp.Actor(tokens[2], tokens[3]),
         target = new nwclp.Actor(tokens[4], tokens[5]),
+        // TODO rename to action
         event = new nwclp.Event(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10], tokens[11]),
         log = new nwclp.Entry(timestamp, owner, source, target, event);
     return log;

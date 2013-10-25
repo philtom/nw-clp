@@ -153,27 +153,30 @@ nwclp.ActionMap = function() {
   },
 
   this.damageForOwner = function(id) {
-    var sourceActions = self.actionsByOwner[id];
-    return _.reduce(_.values(sourceActions), function(total, actions) {
-      return _.reduce(_.values(actions), function(t, value) {
-        if (value > 0) {
-          return t + value;
-        } else {
-          return t;
-        }
-      }, total);
-    }, 0);
+    return self.metricForOwner(id, function(value) {
+      if (value > 0) {
+        return value;
+      } else {
+        return 0;
+      }
+    });
   },
 
   this.healsForOwner = function(id) {
+    return self.metricForOwner(id, function(value) {
+      if (value < 0) {
+        return -value;
+      } else {
+        return 0;
+      }
+    });
+  },
+
+  this.metricForOwner = function(id, metric) {
     var sourceActions = self.actionsByOwner[id];
     return _.reduce(_.values(sourceActions), function(total, actions) {
       return _.reduce(_.values(actions), function(t, value) {
-        if (value < 0) {
-          return t - value;
-        } else {
-          return t;
-        }
+        return t + metric(value);
       }, total);
     }, 0);
   };
