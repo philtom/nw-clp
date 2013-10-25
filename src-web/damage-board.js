@@ -6,6 +6,7 @@ nwclp.DamageBoard = function(el, file) {
   this.lastRead = 0,
   this.leftOver = "",
   this.incrementalRead = function() {
+    // reading at most 1 MB into memory at a time.  might need to optimise this buffer size.
     var endByte = Math.min(self.lastRead + 1048576, file.size),
         chunk = null,
         reader = null;
@@ -40,26 +41,33 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.parseLines = function(lines) {
-    lines.forEach(function(line) {
-      var entry = nwclp.clp.parseCombatLogEntry(line);
-      self.addEntry(entry);
+    var entries = _.map(lines, nwclp.clp.parseCombatLogEntry);
+
+    var entriesByOwner = _.groupBy(entries, function(entry) {
+      return entry.owner.id;
     });
+
+    _.each(entriesByOwner, self.addEntries);
   },
 
-  this.addEntry = function(entry) {
-    //$(self.el).append(JSON.stringify(entry) + "<hr>")
-    // TODO cache log entries
-    //nw.logs.push(log);
-    if (entry.owner.id.indexOf('P') == 0) {
-      var row = self.getOrCreateRow(entry.owner);
-      var damageDone = $(row).children(".damage-done")[0];
-      var newDamage = parseFloat($(damageDone).attr("value")) + parseFloat(self.damage(entry));
-      $(damageDone).text(parseInt(newDamage));
-      $(damageDone).attr("value", newDamage);
-      var healsDone = $(row).children(".heals-done")[0];
-      var newHeals = parseFloat($(healsDone).attr("value")) + parseFloat(self.heals(entry))
-      $(healsDone).text(parseInt(newHeals));
-      $(healsDone).attr("value", newHeals);
+  this.addEntries = function(entries, id) {
+    if (id.indexOf('P') == 0 && entries.length > 0) {
+      var owner = entries[0].owner;
+      var row = self.getOrCreateRow(owner);
+      var damageDoneCell = $(row).children(".damage-done")[0];
+      var damageDone = parseFloat($(damageDoneCell).attr("value"));
+      var healsDoneCell = $(row).children(".heals-done")[0];
+      var healsDone = parseFloat($(healsDoneCell).attr("value"));
+      entries.forEach(function(entry) {
+        damageDone = damageDone + parseFloat(self.damage(entry));
+        healsDone = healsDone + parseFloat(self.heals(entry));
+      });
+
+      $(damageDoneCell).text(parseInt(damageDone));
+      $(damageDoneCell).attr("value", damageDone);
+
+      $(healsDoneCell).text(parseInt(healsDone));
+      $(healsDoneCell).attr("value", healsDone);
     }
   },
 
