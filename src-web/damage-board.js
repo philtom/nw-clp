@@ -9,7 +9,7 @@ nwclp.DamageBoard = function(el, file) {
     var endByte = Math.min(self.lastRead + 1048576, file.size),
         chunk = null,
         reader = null;
-    console.log("start: " + self.lastRead + " end: " + endByte);
+    //console.log("start: " + self.lastRead + " end: " + endByte);
     chunk = file.slice(self.lastRead, endByte);
     reader = new FileReader();
     reader.onload = function(evt) {
@@ -53,9 +53,13 @@ nwclp.DamageBoard = function(el, file) {
     if (entry.owner.id.indexOf('P') == 0) {
       var row = self.getOrCreateRow(entry.owner);
       var damageDone = $(row).children(".damage-done")[0];
-      $(damageDone).text(parseFloat($(damageDone).text()) + parseFloat(self.damage(entry)));
+      var newDamage = parseFloat($(damageDone).attr("value")) + parseFloat(self.damage(entry));
+      $(damageDone).text(parseInt(newDamage));
+      $(damageDone).attr("value", newDamage);
       var healsDone = $(row).children(".heals-done")[0];
-      $(healsDone).text(parseFloat($(healsDone).text()) + parseFloat(self.heals(entry)));
+      var newHeals = parseFloat($(healsDone).attr("value")) + parseFloat(self.heals(entry))
+      $(healsDone).text(parseInt(newHeals));
+      $(healsDone).attr("value", newHeals);
     }
   },
 
@@ -76,18 +80,27 @@ nwclp.DamageBoard = function(el, file) {
     var row = document.createElement("div");
     $(row).attr("id", self.idToHtmlId(id))
     $(row).addClass("row");
-    $(row).append(self.createCell(name, "name"));
-    $(row).append(self.createCell(parseInt(damageDone), "damage-done"));
-    $(row).append(self.createCell(parseInt(healsDone), "heals-done"));
+    $(row).attr("name", name);
+    $(row).append(self.createCell(name, name, "name"));
+    $(row).append(self.createCell(parseInt(damageDone), damageDone, "damage-done"));
+    $(row).append(self.createCell(parseInt(healsDone), healsDone, "heals-done"));
     $(self.el).append(row)
+
+    $(self.el).children().sort(function(a,b) {
+      var keyA = $(a).attr('name').toLowerCase();
+      var keyB = $(b).attr('name').toLowerCase();
+      return keyA < keyB ? -1 : 1;
+    }).appendTo(self.el);
+
     return row;
   },
 
-  this.createCell = function(text, type) {
+  this.createCell = function(text, value, type) {
     var cell = document.createElement("div");
     $(cell).addClass("cell");
     $(cell).addClass(type);
     $(cell).text(text);
+    $(cell).attr("value", value);
     return cell;
   },
 
