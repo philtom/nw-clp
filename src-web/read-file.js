@@ -5,6 +5,7 @@ window.onload = function() {
 function handleFileSelect(evt) {
   var files = evt.target.files; // FileList object
   var reader = new FileReader();
+  var clp = new nwclp.CombatLogParser()
 
   // If we use onloadend, we need to check the readyState.
   reader.onloadend = function(evt) {
@@ -14,7 +15,7 @@ function handleFileSelect(evt) {
       var lines = text.split(/[\r\n]+/g);
       lines.forEach(function(line) {
         if (line != "") {
-          var log = nwclp.clp.parseCombatLogEntry(line);
+          var log = clp.parseCombatLogEntry(line);
           logs.push(JSON.stringify(log));
         }
       });

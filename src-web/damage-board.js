@@ -5,6 +5,7 @@ nwclp.DamageBoard = function(el, file) {
   this.file = file,
   this.lastRead = 0,
   this.leftOver = "",
+  this.clp = new nwclp.CombatLogParser(),
   this.incrementalRead = function() {
     // reading at most 1 MB into memory at a time.  might need to optimise this buffer size.
     var endByte = Math.min(self.lastRead + 1048576, file.size),
@@ -41,7 +42,7 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.parseLines = function(lines) {
-    var entries = _.map(lines, nwclp.clp.parseCombatLogEntry);
+    var entries = _.map(lines, self.clp.parseCombatLogEntry);
 
     var entriesByOwner = _.groupBy(entries, function(entry) {
       return entry.owner.id;

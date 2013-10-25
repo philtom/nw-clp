@@ -1,6 +1,6 @@
 var nwclp = new Object();
 
-nwclp.clp = new function() {
+nwclp.CombatLogParser = function() {
   var self = this;
 
   this.parseCombatLogEntry = function (log) {
