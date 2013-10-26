@@ -10,9 +10,9 @@ nwclp.CombatLogParser = function() {
         owner = new nwclp.Actor(tokens[0], tokens[1]),
         source = new nwclp.Actor(tokens[2], tokens[3]),
         target = new nwclp.Actor(tokens[4], tokens[5]),
-        // TODO rename to action
-        event = new nwclp.Event(tokens[6], tokens[7], tokens[8], tokens[9], tokens[10], tokens[11]),
-        log = new nwclp.Entry(timestamp, owner, source, target, event);
+        power = new nwclp.Power(tokens[6], tokens[7]),
+        outcome = new nwclp.Outcome(tokens[8], tokens[9], tokens[10], tokens[11]),
+        log = new nwclp.Entry(timestamp, owner, source, target, power, outcome);
     return log;
   },
 
@@ -30,12 +30,13 @@ nwclp.CombatLogParser = function() {
   };
 }
 
-nwclp.Entry = function (timestamp, owner, source, target, event) {
-  this.timestamp = timestamp;
-  this.owner = owner;
-  this.source = source;
-  this.target = target;
-  this.event = event;
+nwclp.Entry = function (timestamp, owner, source, target, power, outcome) {
+  this.timestamp = timestamp,
+  this.owner = owner,
+  this.source = source,
+  this.target = target,
+  this.power = power,
+  this.outcome = outcome;
 
   if (this.source.id == "*") {
     this.source = owner;
@@ -46,20 +47,23 @@ nwclp.Entry = function (timestamp, owner, source, target, event) {
   }
 }
 
-nwclp.Event = function (name, id, type, flags, value, baseValue) {
-  this.name = name;
-  this.id = id;
-  this.type = type;
-  this.flags = flags.split('|').filter(function(flag) { return !(flag === "") });
-  this.value = value;
-  this.baseValue = baseValue;
-
-  if (this.baseValue == 0) {
-    this.baseValue == value;
-  }
-}
-
 nwclp.Actor = function (name, id) {
   this.name = name;
   this.id = id;
+}
+
+nwclp.Power = function(name, id) {
+  this.name = name;
+  this.id = id;
+}
+
+nwclp.Outcome = function(type, flags, value, basis) {
+  this.type = type,
+  this.flags = flags.split('|').filter(function(flag) { return !(flag === "") }),
+  this.value = value,
+  this.basis = basis;
+
+  if (this.basis == 0) {
+    this.basis = value;
+  }
 }

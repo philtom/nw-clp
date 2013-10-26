@@ -118,16 +118,16 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.damage = function(entry) {
-    if (entry.event.value > 0) {
-      return entry.event.value;
+    if (entry.outcome.value > 0) {
+      return entry.outcome.value;
     } else {
       return 0;
     }
   },
 
   this.heals = function(entry) {
-    if (entry.event.value < 0) {
-      return -entry.event.value;
+    if (entry.outcome.value < 0) {
+      return -entry.outcome.value;
     } else {
       return 0;
     }
@@ -143,15 +143,13 @@ nwclp.DamageBoard = function(el, file) {
 
 nwclp.ActionMap = function() {
   var self = this;
-  // owner
-  //  source
-  //    action = value
-  this.actionsByOwner = {},
+  // outcomeStore[ownerId][sourceId][powerId] = [outcomes]
+  this.outcomesStore = {},
   this.addEvent = function(event) {
-    var bySource = self.actionsByOwner[event.owner.id];
+    var bySource = self.outcomesStore[event.owner.id];
     if (bySource == null) {
       bySource = {};
-      self.actionsByOwner[event.owner.id] = bySource;
+      self.outcomesStore[event.owner.id] = bySource;
     }
 
     var byAction = bySource[event.source.id];
@@ -160,19 +158,19 @@ nwclp.ActionMap = function() {
       bySource[event.source.id] = byAction;
     }
 
-    var value = byAction[event.event.id];
-    if (value == null) {
-      value = 0;
+    var outcomes = byAction[event.power.id];
+    if (outcomes == null) {
+      outcomes = [];
+      byAction[event.power.id] = outcomes;
     }
 
-    value = parseFloat(value) + parseFloat(event.event.value);
-    byAction[event.event.id] = value;
+    outcomes.push(event.outcome);
   },
 
   this.damageForOwner = function(id) {
-    return self.metricForOwner(id, function(value) {
-      if (value > 0) {
-        return value;
+    return self.metricForOwner(id, function(outcome) {
+      if (outcome.value > 0) {
+        return outcome.value;
       } else {
         return 0;
       }
@@ -180,9 +178,9 @@ nwclp.ActionMap = function() {
   },
 
   this.healsForOwner = function(id) {
-    return self.metricForOwner(id, function(value) {
-      if (value < 0) {
-        return -value;
+    return self.metricForOwner(id, function(outcome) {
+      if (outcome.value < 0) {
+        return -outcome.value;
       } else {
         return 0;
       }
@@ -190,10 +188,12 @@ nwclp.ActionMap = function() {
   },
 
   this.metricForOwner = function(id, metric) {
-    var sourceActions = self.actionsByOwner[id];
-    return _.reduce(_.values(sourceActions), function(total, actions) {
-      return _.reduce(_.values(actions), function(t, value) {
-        return t + metric(value);
+    var bySource = self.outcomesStore[id];
+    return _.reduce(_.values(bySource), function(total, powers) {
+      return _.reduce(_.values(powers), function(powerTotal, outcomes) {
+        return _.reduce(outcomes, function(outcomesTotal, outcome) {
+          return outcomesTotal + parseFloat(metric(outcome));
+        }, powerTotal);
       }, total);
     }, 0);
   };
