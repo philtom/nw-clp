@@ -102,14 +102,21 @@ nwclp.DamageBoard = function(el, file) {
   this.repaintGroup = function(actor) {
     var group = self.getOrCreateGroup(actor),
         ownerRow;
-    ownerRow = self.getOrCreateRow(group, actor);
-    var damageDoneCell = $(ownerRow).children(".damage-done")[0];
-    var healsDoneCell = $(ownerRow).children(".heals-done")[0];
+    self.updateRow(group, actor, "owner", self.actionMap.damageForOwner(actor.id), self.actionMap.healsForOwner(actor.id))
+    var sources = _.filter(self.actionMap.sources(actor.id), function(source) {
+      return source.id.length > 0;
+    });
+    _.each(sources, function(source) {
+      self.updateRow(group, source, "source", self.actionMap.damageForSource(actor.id, source.id), self.actionMap.healsForSource(actor.id, source.id))
+    });
+  },
 
-    $(damageDoneCell).text(parseInt(self.actionMap.damageForOwner(actor.id)));
-
-    $(healsDoneCell).text(parseInt(self.actionMap.healsForOwner(actor.id)));
-
+  this.updateRow = function(group, actor, actorType, damage, heals) {
+    var row = self.getOrCreateRow(group, actor, actorType);
+    var damageDoneCell = $(row).children(".damage-done")[0];
+    var healsDoneCell = $(row).children(".heals-done")[0];
+    $(damageDoneCell).text(parseInt(damage));
+    $(healsDoneCell).text(parseInt(heals));
   },
 
   this.getOrCreateGroup = function(actor) {
@@ -138,16 +145,16 @@ nwclp.DamageBoard = function(el, file) {
     return div;
   },
 
-  this.getOrCreateRow = function(parent, actor) {
-    var row = self.getRow(parent, "owner");
+  this.getOrCreateRow = function(parent, actor, actorType) {
+    var row = self.getRow(parent, actor.id, actorType);
     if (row == null) {
-      row = self.createRow(parent, "owner", actor.id, actor.name, 0, 0);
+      row = self.createRow(parent, actorType, actor.id, actor.name, 0, 0);
     }
     return row;
   },
 
-  this.getRow = function(parent, type) {
-    var rows = $(parent).children("." + type);
+  this.getRow = function(parent, id, actorType) {
+    var rows = $(parent).children("." + actorType + "." + self.idToHtmlId(id));
     if (rows.length == 0) {
       return null;
     } else {
@@ -159,15 +166,16 @@ nwclp.DamageBoard = function(el, file) {
     return id.replace(/[^a-zA-Z0-9_:.-]/g, '_');
   },
 
-  this.createRow = function(parent, type, id, name, damageDone, healsDone) {
+  this.createRow = function(parent, actorType, id, name, damageDone, healsDone) {
     var row = document.createElement("div");
     $(row).addClass("row");
-    $(row).addClass(type);
+    $(row).addClass(actorType);
+    $(row).addClass(self.idToHtmlId(id));
     $(row).attr("name", name);
-    $(row).append(self.createCell(name, "name"));
-    $(row).append(self.createCell(parseInt(damageDone), "damage-done"));
-    $(row).append(self.createCell(parseInt(healsDone), "heals-done"));
-    $(row).append(self.createCell("<a href=\"javascript:void(0);\" onclick=\"hide('" + id +"')\">hide</a>", "hide"));
+    $(row).append(self.createCell(name, actorType, "name"));
+    $(row).append(self.createCell(parseInt(damageDone), actorType, "damage-done"));
+    $(row).append(self.createCell(parseInt(healsDone), actorType, "heals-done"));
+    $(row).append(self.createCell("<a href=\"javascript:void(0);\" onclick=\"hide('" + id +"')\">hide</a>", actorType, "hide"));
     $(parent).append(row)
 
 //    $(self.el).children().sort(function(a,b) {
@@ -179,10 +187,11 @@ nwclp.DamageBoard = function(el, file) {
     return row;
   },
 
-  this.createCell = function(text, type) {
+  this.createCell = function(text, actorType, valueType) {
     var cell = document.createElement("div");
     $(cell).addClass("cell");
-    $(cell).addClass(type);
+    $(cell).addClass(actorType);
+    $(cell).addClass(valueType);
     $(cell).html(text);
     return cell;
   };
@@ -190,6 +199,9 @@ nwclp.DamageBoard = function(el, file) {
 
 nwclp.ActionMap = function() {
   var self = this;
+  // outcomeStore = sourcesByOwner
+  // outcomeStore[ownerId] = powersBySource
+  // outcomeStore[ownerId][sourceId] = outcomesByPower
   // outcomeStore[ownerId][sourceId][powerId] = [outcomes]
   this.outcomesStore = {},
   this.actorsById = {},
@@ -251,24 +263,28 @@ nwclp.ActionMap = function() {
     });
   },
 
+  this.damage = function(outcome) {
+    if (outcome.value > 0) {
+      return outcome.value;
+    } else {
+      return 0;
+    }
+  },
+
+  this.heals = function(outcome) {
+    if (outcome.value < 0) {
+      return -outcome.value;
+    } else {
+      return 0;
+    }
+  },
+
   this.damageForOwner = function(id) {
-    return self.metricForOwner(id, function(outcome) {
-      if (outcome.value > 0) {
-        return outcome.value;
-      } else {
-        return 0;
-      }
-    });
+    return self.metricForOwner(id, self.damage);
   },
 
   this.healsForOwner = function(id) {
-    return self.metricForOwner(id, function(outcome) {
-      if (outcome.value < 0) {
-        return -outcome.value;
-      } else {
-        return 0;
-      }
-    });
+    return self.metricForOwner(id, self.heals);
   },
 
   this.metricForOwner = function(id, metric) {
@@ -278,6 +294,23 @@ nwclp.ActionMap = function() {
         return _.reduce(outcomes, function(outcomesTotal, outcome) {
           return outcomesTotal + parseFloat(metric(outcome));
         }, powerTotal);
+      }, total);
+    }, 0);
+  },
+
+  this.damageForSource = function(ownerId, sourceId) {
+    return self.metricForSource(ownerId, sourceId, self.damage);
+  },
+
+  this.healsForSource = function(ownerId, sourceId) {
+    return self.metricForSource(ownerId, sourceId, self.heals);
+  },
+
+  this.metricForSource = function(ownerId, sourceId, metric) {
+    var outcomesByPower = self.outcomesStore[ownerId][sourceId];
+    return _.reduce(_.values(outcomesByPower), function(total, outcomes) {
+      return _.reduce(outcomes, function(outcomesTotal, outcome) {
+        return parseFloat(outcomesTotal) + parseFloat(metric(outcome));
       }, total);
     }, 0);
   };

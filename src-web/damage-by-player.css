@@ -17,10 +17,17 @@
 
 .cell {
   display:table-cell;
-  width:25%;
   text-align:right;
-  padding-right:5px;
-  padding-left:5px;
+  padding-right:10px;
+  padding-left:10px;
+}
+
+.cell.name {
+  text-align:left;
+}
+
+.cell.source.name {
+  padding-left:20px;
 }
 
 .hide {
