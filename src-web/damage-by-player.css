@@ -7,6 +7,10 @@
   font-weight:bold;
 }
 
+.group {
+  display:table-row-group;
+}
+
 .row {
   display:table-row;
 }
