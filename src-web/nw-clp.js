@@ -48,8 +48,19 @@ nwclp.Entry = function (timestamp, owner, source, target, power, outcome) {
 }
 
 nwclp.Actor = function (name, id) {
-  this.name = name;
-  this.id = id;
+  this.name = name,
+  this.id = id,
+  this.type,
+  this.instanceOf,
+  this.shortId;
+
+  if (id.length > 0 && id != "*") {
+    var idRegex = /([CP])\[(\S+) ([^\]]+)\]/;
+    var match = idRegex.exec(id);
+    this.type = match[1];
+    this.instanceId = match[2];
+    this.shortId = match[3];
+  }
 }
 
 nwclp.Power = function(name, id) {

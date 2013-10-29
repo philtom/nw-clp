@@ -53,6 +53,7 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.addEntries = function(entries, id) {
+    // caution:  this id is not a short id
     if (id.indexOf('P') == 0 && entries.length > 0) {
       var owner = entries[0].owner;
       //var row = self.getOrCreateRow(self.el, owner);
@@ -86,11 +87,11 @@ nwclp.DamageBoard = function(el, file) {
     _.each(owners, function(owner) {
       // draw owner row
       console.log(owner);
-      sources = self.actionMap.sources(owner.id);
+      sources = self.actionMap.sources(owner.shortId);
       _.each(sources, function(source) {
         // draw source row
         console.log(source);
-        powers = self.actionMap.powers(owner.id, source.id);
+        powers = self.actionMap.powers(owner.shortId, source.shortId);
         _.each(powers, function(power) {
           // draw power row
           console.log(power);
@@ -101,13 +102,15 @@ nwclp.DamageBoard = function(el, file) {
 
   this.repaintGroup = function(actor) {
     var group = self.getOrCreateGroup(actor),
-        ownerRow;
-    self.updateRow(group, actor, "owner", self.actionMap.damageForOwner(actor.id), self.actionMap.healsForOwner(actor.id))
-    var sources = _.filter(self.actionMap.sources(actor.id), function(source) {
+        ownerRow,
+        sources,
+        powers;
+    self.updateRow(group, actor, "owner", self.actionMap.damageForOwner(actor.shortId), self.actionMap.healsForOwner(actor.shortId))
+    sources = _.filter(self.actionMap.sources(actor.shortId), function(source) {
       return source.id.length > 0;
     });
     _.each(sources, function(source) {
-      self.updateRow(group, source, "source", self.actionMap.damageForSource(actor.id, source.id), self.actionMap.healsForSource(actor.id, source.id))
+      self.updateRow(group, source, "source", self.actionMap.damageForSource(actor.shortId, source.shortId), self.actionMap.healsForSource(actor.shortId, source.shortId))
     });
   },
 
@@ -120,7 +123,7 @@ nwclp.DamageBoard = function(el, file) {
   },
 
   this.getOrCreateGroup = function(actor) {
-    var group = self.getGroup(actor.id);
+    var group = self.getGroup(actor.shortId);
     if (group == null) {
       group = self.createGroup(actor)
     }
@@ -139,16 +142,16 @@ nwclp.DamageBoard = function(el, file) {
 
   this.createGroup = function(actor) {
     var div = document.createElement("div");
-    $(div).attr("id", self.idToHtmlId(actor.id));
+    $(div).attr("id", self.idToHtmlId(actor.shortId));
     $(div).addClass("group");
     $(self.el).append(div);
     return div;
   },
 
   this.getOrCreateRow = function(parent, actor, actorType) {
-    var row = self.getRow(parent, actor.id, actorType);
+    var row = self.getRow(parent, actor.shortId, actorType);
     if (row == null) {
-      row = self.createRow(parent, actorType, actor.id, actor.name, 0, 0);
+      row = self.createRow(parent, actorType, actor.shortId, actor.name, 0, 0);
     }
     return row;
   },
@@ -212,31 +215,31 @@ nwclp.ActionMap = function() {
         outcomes,
         power;
 
-    bySource = self.outcomesStore[event.owner.id];
+    bySource = self.outcomesStore[event.owner.shortId];
     if (bySource == null) {
       bySource = {};
-      self.outcomesStore[event.owner.id] = bySource;
+      self.outcomesStore[event.owner.shortId] = bySource;
     }
 
-    byPower = bySource[event.source.id];
+    byPower = bySource[event.source.shortId];
     if (byPower == null) {
       byPower = {};
-      bySource[event.source.id] = byPower;
+      bySource[event.source.shortId] = byPower;
     }
 
-    outcomes = byPower[event.power.id];
+    outcomes = byPower[event.power.shortId];
     if (outcomes == null) {
       outcomes = [];
-      byPower[event.power.id] = outcomes;
+      byPower[event.power.shortId] = outcomes;
     }
 
     outcomes.push(event.outcome);
 
-    self.actorsById[event.owner.id] = event.owner;
-    self.actorsById[event.source.id] = event.source;
-    power = self.powersById[event.power.id];
+    self.actorsById[event.owner.shortId] = event.owner;
+    self.actorsById[event.source.shortId] = event.source;
+    power = self.powersById[event.power.shortId];
     if (!power || power.name.length == 0) {
-      self.powersById[event.power.id] = event.power;
+      self.powersById[event.power.shortId] = event.power;
     }
   },
 
