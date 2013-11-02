@@ -30,6 +30,10 @@
   padding-left:20px;
 }
 
+.cell.power.name {
+  padding-left:30px;
+}
+
 .hide {
   text-align:left;
   font-size:x-small;

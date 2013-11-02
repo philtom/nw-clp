@@ -64,8 +64,9 @@ nwclp.Actor = function (name, id) {
 }
 
 nwclp.Power = function(name, id) {
-  this.name = name;
-  this.id = id;
+  this.name = name,
+  this.id = id,
+  this.shortId = name; // ew
 }
 
 nwclp.Outcome = function(type, flags, value, basis) {

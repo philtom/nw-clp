@@ -105,12 +105,20 @@ nwclp.DamageBoard = function(el, file) {
         ownerRow,
         sources,
         powers;
+    $(group).empty();
     self.updateRow(group, actor, "owner", self.actionMap.damageForOwner(actor.shortId), self.actionMap.healsForOwner(actor.shortId))
     sources = _.filter(self.actionMap.sources(actor.shortId), function(source) {
       return source.id.length > 0;
     });
     _.each(sources, function(source) {
       self.updateRow(group, source, "source", self.actionMap.damageForSource(actor.shortId, source.shortId), self.actionMap.healsForSource(actor.shortId, source.shortId))
+      powers = self.actionMap.powers(actor.shortId, source.shortId);
+      _.each(powers, function(power) {
+        console.log(actor.name + " " + source.name + " " + power.name);
+        if (power.name.length > 0) {
+          self.updateRow(group, power, "power", self.actionMap.damageForPower(actor.shortId, source.shortId, power.name), self.actionMap.healsForPower(actor.shortId, source.shortId, power.name));
+        }
+      });
     });
   },
 
@@ -158,6 +166,7 @@ nwclp.DamageBoard = function(el, file) {
 
   this.getRow = function(parent, id, actorType) {
     var rows = $(parent).children("." + actorType + "." + self.idToHtmlId(id));
+    console.log(parent + " " + id + " " + actorType + " " + rows);
     if (rows.length == 0) {
       return null;
     } else {
@@ -315,6 +324,21 @@ nwclp.ActionMap = function() {
       return _.reduce(outcomes, function(outcomesTotal, outcome) {
         return parseFloat(outcomesTotal) + parseFloat(metric(outcome));
       }, total);
+    }, 0);
+  },
+
+  this.damageForPower = function(ownerId, sourceId, powerId) {
+    return self.metricForPower(ownerId, sourceId, powerId, self.damage);
+  },
+
+  this.healsForPower = function(ownerId, sourceId, powerId) {
+    return self.metricForPower(ownerId, sourceId, powerId, self.heals);
+  },
+
+  this.metricForPower = function(ownerId, sourceId, powerId, metric) {
+    var outcomes = self.outcomesStore[ownerId][sourceId][powerId];
+    return _.reduce(outcomes, function(outcomesTotal, outcome) {
+      return parseFloat(outcomesTotal) + parseFloat(metric(outcome));
     }, 0);
   };
 }
